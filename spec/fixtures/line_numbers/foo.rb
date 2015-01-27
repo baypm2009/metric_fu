@@ -1,5 +1,4 @@
 class Foo
-
   def self.awesome
     1 + 1
   end
@@ -12,9 +11,8 @@ class Foo
     puts "Hi There"
   end
 
-
   def awesome
-    3+4
+    3 + 4
   end
 
   class << self
@@ -30,4 +28,4 @@ class Foo
   end
 end
 
-#comment
+# comment

@@ -16,20 +16,22 @@ module MetricFu
       end
 
       def to_h
-        {:content => @content, :was_run => @was_run}
+        { content: @content, was_run: @was_run }
       end
 
       def covered?
         @was_run.one?
       end
+
       def missed?
         @was_run.zero?
       end
+
       def ignored?
         @was_run.nil?
       end
       def self.line_coverage(lines)
-        lines.map{|line| line[:was_run] }
+        lines.map { |line| line[:was_run] }
       end
       def self.covered_lines(line_coverage)
         line_coverage.count(1)
@@ -49,7 +51,6 @@ module MetricFu
 
       files = assemble_files(rcov_text)
 
-
       TestCoverage.new(files).to_h
     end
 
@@ -57,21 +58,21 @@ module MetricFu
 
     def assemble_files(rcov_text)
       files = {}
-      rcov_text.each_slice(2) {|out| files[out.first.strip] = out.last}
-      files.each_pair {|fname, content| files[fname] = content.split("\n") }
+      rcov_text.each_slice(2) { |out| files[out.first.strip] = out.last }
+      files.each_pair { |fname, content| files[fname] = content.split("\n") }
       files.each_pair do |fname, content|
         content.map! do |raw_line|
-          covered_line = if raw_line.start_with?('--')
+          covered_line = if raw_line.start_with?("--")
                            nil # simplecov ignores some lines
-                         elsif raw_line.start_with?('!!')
+                         elsif raw_line.start_with?("!!")
                            0
                          else
                            1
                          end
           Line.new(raw_line[3..-1], covered_line).to_h
         end
-        content.reject! {|line| line[:content].to_s == '' }
-        files[fname] = {:lines => content}
+        content.reject! { |line| line[:content].to_s == "" }
+        files[fname] = { lines: content }
       end
       files
     end
@@ -113,6 +114,7 @@ module MetricFu
       end
 
       private
+
       # TODO: remove multiple side effects
       #   sets global ivars and
       #   modifies the param passed in
@@ -131,9 +133,9 @@ module MetricFu
 
       def add_global_percent_run(test_coverage, total_lines, total_lines_run)
         percentage = self.class.floating_percent(total_lines_run, total_lines)
-        test_coverage.update({
-          :global_percent_run => round_to_tenths(percentage)
-        })
+        test_coverage.update(
+          global_percent_run: round_to_tenths(percentage)
+        )
       end
 
       def add_method_data(test_coverage)
@@ -141,7 +143,7 @@ module MetricFu
           file_contents = ""
           coverage = []
 
-          info[:lines].each_with_index do |line, index|
+          info[:lines].each_with_index do |line, _index|
             file_contents << "#{line[:content]}\n"
             coverage << line[:was_run]
           end
@@ -172,17 +174,13 @@ module MetricFu
           method_coverage_map.each do |method_name, coverage_data|
             test_coverage[file_path][:methods][method_name] = (coverage_data[:uncovered] / coverage_data[:total].to_f) * 100.0
           end
-
         end
       end
 
       def round_to_tenths(decimal)
-        decimal = 0.0 if decimal.to_s.eql?('NaN')
+        decimal = 0.0 if decimal.to_s.eql?("NaN")
         (decimal * 10).round / 10.0
       end
-
-
     end
-
   end
 end

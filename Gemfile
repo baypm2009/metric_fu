@@ -21,6 +21,7 @@ end
 group :test, :local_development  do
   gem 'pry'
   gem 'pry-nav'
+  gem 'rubocop'
 end
 
 # Added by devtools
